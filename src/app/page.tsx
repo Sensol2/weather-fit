@@ -1,54 +1,76 @@
 "use client";
 
 import styled from "styled-components";
+import ResultSection from "@/components/resultSection";
+import AvatarsSection from "@/components/avatarsSection";
+import LocationsSection from "@/components/locationsSection";
+import ClothingTypeSelect from "@/components/clothingTypeSelect";
+import { useState } from "react";
 
 export default function Home() {
-  const day = "20일";
-  const location = "동작구";
-  const clothingType = "긴팔";
+  const [location, setLocation] = useState("서울");
+  const [clothingType, setClothingType] = useState("긴팔");
+  const [showResult, setShowResult] = useState(false);
+
+  const clothingOptions = [
+    { id: 1, name: "긴팔" },
+    { id: 2, name: "반팔" },
+    { id: 3, name: "돕바" },
+    { id: 4, name: "과잠" },
+    { id: 5, name: "패딩" },
+    { id: 6, name: "코트" },
+    { id: 7, name: "민소매" },
+    { id: 8, name: "후드티" },
+  ];
+
+  const handleCheckClick = () => {
+    setShowResult(true);
+  };
+
+  const handleClothingSelect = (selectedClothing: string) => {
+    setClothingType(selectedClothing);
+    setShowResult(false); // 의류 변경 시 결과 숨기기
+  };
 
   return (
     <Container>
       {/* 메인 제목 영역 */}
       <HeaderSection>
         <MainTitle>
-          오늘 <ClothingBox>긴팔</ClothingBox> 입어도 될까?
+          오늘 <ClothingBox>{clothingType}</ClothingBox> 입어도 될까?
         </MainTitle>
       </HeaderSection>
 
       {/* 입력 영역 */}
       <InputSection>
         <InputGroup>
-          <InputButton>{day}</InputButton>
-          <InputButton>{location}</InputButton>
-          <span>에서</span>
-          <InputButton>{clothingType}</InputButton>
-          <span>가능?</span>
+        {/* 지역 선택 + 현재 위치 매핑 */}
+        <LocationsSection selectedCityKo={location} onCityChange={setLocation} />
+        <Span>에서</Span>
+        <ClothingTypeSelect value={clothingType} options={clothingOptions} onChange={setClothingType} />
+        <Span>가능?</Span>
         </InputGroup>
       </InputSection>
 
       {/* 확인 버튼 */}
       <CheckButtonSection>
-        <CheckButton>확인하기</CheckButton>
+        <CheckButton onClick={handleCheckClick}>확인하기</CheckButton>
       </CheckButtonSection>
 
+      {/* 의류 선택 영역 */}
+      <AvatarsSection
+        clothingOptions={clothingOptions}
+        selectedClothing={clothingType}
+        onClothingSelect={handleClothingSelect}
+      />
+      
       {/* 결과 영역 */}
-      <ResultSection>
-        <WeatherInfo>
-          <RecommendationText color="#ff6b6b">불가능</RecommendationText>
-          <WeatherDetails>
-            <WeatherRow>
-              <span>최저기온: -도</span>
-              <span>최고기온: -도</span>
-            </WeatherRow>
-            <WeatherRow>
-              <span>체감온도: -도</span>
-              <span>풍속: -m/s</span>
-            </WeatherRow>
-          </WeatherDetails>
-          <ResultMessage>쌉가능입니다.</ResultMessage>
-        </WeatherInfo>
-      </ResultSection>
+      {showResult && (
+        <>
+          <div style={{height: '40px'}} /> {/* Gap between sections */}
+          <ResultSection city={location} />
+        </>
+      )}
     </Container>
   );
 }
@@ -98,25 +120,15 @@ const InputGroup = styled.div`
   gap: 15px;
   font-size: 1.5rem;
   font-weight: 600;
-  
-  span {
-    color: #333;
-  }
 `;
 
-const InputButton = styled.button`
-  background: white;
-  border: 3px solid #000;
-  border-radius: 8px;
-  padding: 8px 20px;
+const Span = styled.span`
+  color: #333;
   font-size: 1.2rem;
   font-weight: 600;
-  cursor: pointer;
-  
-  &:hover {
-    background: #f0f0f0;
-  }
 `;
+
+// InputButton removed; unified selects used instead
 
 const CheckButtonSection = styled.div`
   display: flex;
@@ -145,50 +157,5 @@ const CheckButton = styled.button`
   }
 `;
 
-const ResultSection = styled.div`
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  flex-wrap: wrap;
-  gap: 40px;
-`;
+// selection styles moved into components/ClothingSelectionSection.tsx
 
-const WeatherInfo = styled.div`
-  text-align: center;
-  background: white;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  min-width: 300px;
-`;
-
-const RecommendationText = styled.div<{color: string}>`
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: ${props => props.color};
-  margin-bottom: 20px;
-`;
-
-const WeatherDetails = styled.div`
-  margin-bottom: 20px;
-`;
-
-const WeatherRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-  font-size: 1.1rem;
-  
-  span {
-    color: #333;
-  }
-`;
-
-const ResultMessage = styled.div`
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: #000;
-  margin-top: 15px;
-`;

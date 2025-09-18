@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   compiler: {
-    styledComponents: true, // ✅ styled-components 최적화
+    styledComponents: true,
   },
 };
 
